@@ -1,6 +1,7 @@
 [package]
-name = "ctest"
+name = "nom-syslog"
 version = "0.1.0"
 authors = ["hmarshall <hunter.marshall@viasat.com>"]
 
 [dependencies]
+nom = "*"
