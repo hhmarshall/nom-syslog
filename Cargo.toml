@@ -1,0 +1,6 @@
+[package]
+name = "ctest"
+version = "0.1.0"
+authors = ["hmarshall <hunter.marshall@viasat.com>"]
+
+[dependencies]
