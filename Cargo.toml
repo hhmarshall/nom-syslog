@@ -1,7 +1,8 @@
 [package]
 name = "nom-syslog"
 version = "0.1.0"
-authors = ["hmarshall <hunter.marshall@viasat.com>"]
+authors = ["hmarshall <hunter.marshall@viasat.com>", "Xavier Lange <xrlange@gmail.com>"]
 
 [dependencies]
 nom = "*"
+time = "*"
