@@ -50,11 +50,11 @@ named!(ts<&str,time::Tm>,
 
 #[derive(Debug)]
 pub struct Syslog3164Message<'a> {
-    pri: &'a str,
-    ts: time::Tm,
-    host: &'a str,
-    tag: Option<(&'a str, Option<&'a str>)>,
-    msg: &'a str,
+    pub pri: &'a str,
+    pub ts: time::Tm,
+    pub host: &'a str,
+    pub tag: Option<(&'a str, Option<&'a str>)>,
+    pub msg: &'a str,
 }
 
 fn tag_delim(ch: char) -> bool {
