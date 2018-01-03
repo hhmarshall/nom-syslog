@@ -3,6 +3,9 @@ name = "nom-syslog"
 version = "0.1.0"
 authors = ["hmarshall <hunter.marshall@viasat.com>", "Xavier Lange <xrlange@gmail.com>"]
 
+[lib]
+name = "nom_syslog"
+
 [dependencies]
 nom = "*"
 time = "*"
