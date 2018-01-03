@@ -7,5 +7,5 @@ authors = ["hmarshall <hunter.marshall@viasat.com>", "Xavier Lange <xrlange@gmai
 name = "nom_syslog"
 
 [dependencies]
-nom = "*"
-time = "*"
+nom = "3.2"
+time = "0.1"
