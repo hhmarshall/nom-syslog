@@ -1,8 +1,15 @@
 [package]
 name = "nom-syslog"
-version = "0.1.0"
+version = "0.1.3"
 authors = ["hmarshall <hunter.marshall@viasat.com>", "Xavier Lange <xrlange@gmail.com>"]
+description = "Zippy parsing for Syslog 3164"
+license = "MIT"
+homepage = "https://github.com/hhmarshall/nom-syslog"
+documentation = "https://docs.rs/nom-syslog"
+
+[lib]
+name = "nom_syslog"
 
 [dependencies]
-nom = "*"
-time = "*"
+nom = "3.2"
+time = "0.1"

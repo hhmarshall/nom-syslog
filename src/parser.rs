@@ -1,14 +1,9 @@
-#![feature(test)]
-
-#[macro_use]
-extern crate nom;
-extern crate test;
-extern crate time;
-use test::Bencher;
+use nom;
+use time;
 
 use std::str::FromStr;
 
-use nom::{digit, rest_s, space, IResult};
+use nom::{digit, rest_s, space};
 
 fn parse_month(s: &str) -> Result<i32, nom::simple_errors::Err> {
     match s {
@@ -54,12 +49,12 @@ named!(ts<&str,time::Tm>,
   );
 
 #[derive(Debug)]
-struct Syslog3164Message<'a> {
-    pri: &'a str,
-    ts: time::Tm,
-    host: &'a str,
-    tag: Option<(&'a str, Option<&'a str>)>,
-    msg: &'a str,
+pub struct Syslog3164Message<'a> {
+    pub pri: &'a str,
+    pub ts: time::Tm,
+    pub host: &'a str,
+    pub tag: Option<(&'a str, Option<&'a str>)>,
+    pub msg: &'a str,
 }
 
 fn tag_delim(ch: char) -> bool {
@@ -89,6 +84,7 @@ named!(parse_tag<&str, (&str,Option<&str>)>,
 
 #[test]
 fn parse_cisco_variation_1() {
+    use nom::IResult;
     let msg1 = r##"<189>Dec 26 23:33:18 10.4.104.208 3890188: Dec 26 2017 23:33:17.792 UTC: %ADJ-5-RESOLVE_REQ_FAIL: Adj resolve request failed for 192.168.57.182 on Vlan55"##;
     let res: IResult<&str, Syslog3164Message> = parse_syslog(msg1);
     assert!(res.is_done());
@@ -138,7 +134,7 @@ named!(better_ts<&str, time::Tm>,
         )
 );
 
-named!(parse_syslog<&str, Syslog3164Message>,
+named!(pub parse_syslog<&str, Syslog3164Message>,
     do_parse!(
       tag_s!("<") >>
       pri: digit >>
@@ -162,6 +158,7 @@ named!(parse_syslog<&str, Syslog3164Message>,
 
 #[test]
 fn parse_nx_win_evt() {
+    use nom::IResult;
     let msg1 = r##"<14>Dec 13 17:45:02 SANTA-CLAUS-W764.blerg.com nxWinEvt[123]: {"EventTime":"🐌017-12-19 17:45:02","Hostname":"fake-hostname","Keywords":-9214364837600034816,"EventType":"AUDIT_SUCCESS","SeverityValue":2,"Severity":"INFO","EventID":4656,"SourceName":"Microsoft-Windows-Security-Auditing","ProviderGuid":"{54849625-5478-4994-A5BA-3E3B0328C30D}","Version":1,"Task":12804,"OpcodeValue":0,"RecordNumber":7613465324,"ProcessID":892,"ThreadID":908,"Channel":"Security","AccessReason":"-","AccessMask":"0x2","PrivilegeList":"-","RestrictedSidCount":"0","ProcessName":"C:\\Windows\\System32\\svchost.exe","EventReceivedTime":"2017-12-19 17:52:27","SourceModuleName":"eventlog","SourceModuleType":"im_msvistalog"}"##;
     let res: IResult<&str, Syslog3164Message> = parse_syslog(msg1);
     assert!(res.is_done());
@@ -173,6 +170,7 @@ fn parse_nx_win_evt() {
 
 #[test]
 fn parse_nx_win_evt_pid_variation_1() {
+    use nom::IResult;
     let msg1 = r##"<14>Dec 13 17:45:02 SANTA-CLAUS-W764.blerg.com nxWinEvt: {"EventTime":"2017-12-19 17:45:02","Hostname":"fake-hostname","Keywords":-9214364837600034816,"EventType":"AUDIT_SUCCESS","SeverityValue":2,"Severity":"INFO","EventID":4656,"SourceName":"Microsoft-Windows-Security-Auditing","ProviderGuid":"{54849625-5478-4994-A5BA-3E3B0328C30D}","Version":1,"Task":12804,"OpcodeValue":0,"RecordNumber":7613465324,"ProcessID":892,"ThreadID":908,"Channel":"Security","AccessReason":"-","AccessMask":"0x2","PrivilegeList":"-","RestrictedSidCount":"0","ProcessName":"C:\\Windows\\System32\\svchost.exe","EventReceivedTime":"2017-12-19 17:52:27","SourceModuleName":"eventlog","SourceModuleType":"im_msvistalog"}"##;
     let res: IResult<&str, Syslog3164Message> = parse_syslog(msg1);
     assert!(res.is_done());
@@ -180,13 +178,4 @@ fn parse_nx_win_evt_pid_variation_1() {
     let (_leftover, parsed) = res.unwrap();
     assert_eq!(parsed.msg, &msg1[57..]);
     assert_eq!(parsed.ts.to_utc().to_timespec().sec, 1515862800)
-}
-
-#[bench]
-fn bench_parser(b: &mut Bencher) {
-    let msg1 = r##"<14>Dec 13 17:45:02 SANTA-CLAUS-W764.blerg.com nxWinEvt[892]: {"EventTime":"2017-12-19 17:45:02","Hostname":"fake-hostname","Keywords":-9214364837600034816,"EventType":"AUDIT_SUCCESS","SeverityValue":2,"Severity":"INFO","EventID":4656,"SourceName":"Microsoft-Windows-Security-Auditing","ProviderGuid":"{54849625-5478-4994-A5BA-3E3B0328C30D}","Version":1,"Task":12804,"OpcodeValue":0,"RecordNumber":7613465324,"ProcessID":892,"ThreadID":908,"Channel":"Security","AccessReason":"-","AccessMask":"0x2","PrivilegeList":"-","RestrictedSidCount":"0","ProcessName":"C:\\Windows\\System32\\svchost.exe","EventReceivedTime":"2017-12-19 17:52:27","SourceModuleName":"eventlog","SourceModuleType":"im_msvistalog"}"##;
-    b.iter(|| {
-        let res: IResult<&str, Syslog3164Message> = parse_syslog(msg1);
-        assert!(res.is_done());
-    });
 }
